@@ -8,7 +8,7 @@ def inserir_pedido():
     """insere um pedido com seus detalhes no banco de dados recebendo informações do usuario quando necessário"""
     customer = buscar_cliente()
     vendedor = buscar_vendedor()
-    pedido = inserir_order(customer, vendedor)
+    pedido = inserir_order(customer[0], vendedor[0])
     while True:
         # escolher inserir um produto no pedido ou terminar o pedido
         os.system("cls" if os.name == "nt" else "clear")
@@ -19,8 +19,8 @@ def inserir_pedido():
             case "1":
                 produto = buscar_produto()
                 quantidade = int(input("Digite a quantidade do produto: "))
-                unit_price = produto.unitprice
-                inserir_order_details(pedido, produto, quantidade, unit_price)
+                unit_price = produto[5]
+                inserir_order_details(pedido, produto[0], unit_price, quantidade)
             case "2":
                 break
             case _:
@@ -29,7 +29,7 @@ def inserir_pedido():
     print("\nProduto inserido com sucesso!\n")
 
 
-def buscar_cliente() -> Customers:
+def buscar_cliente():
     """busca um cliente no banco de dados
 
     Returns:
@@ -43,17 +43,17 @@ def buscar_cliente() -> Customers:
         )
         custumers = search_customers(name_string)
         if custumers == []:
-            name_string = input(
-                "Nenhum consumidor possui esse nome, digite novamente: \n"
+            input(
+                "Nenhum consumidor possui esse nome, pressione enter para tentar novamente. \n"
             )
     for i in range(len(custumers)):
-        print(f"{i} - {custumers[i].companyname}")
+        print(f"{i} - {custumers[i][1]}")
     customer_ordem = int(input("\nEscolha um consumidor: "))
     customer = custumers[customer_ordem]
     return customer
 
 
-def buscar_vendedor() -> Employees:
+def buscar_vendedor():
     """busca um vendedor no banco de dados
 
     Returns:
@@ -67,17 +67,17 @@ def buscar_vendedor() -> Employees:
         )
         vendedores = search_employee(name_string)
         if vendedores == []:
-            name_string = input(
-                "Nenhum vendedor possui esse nome, digite novamente: \n"
+            input(
+                "Nenhum vendedor possui esse nome, pressione enter para tentar novamente. \n"
             )
     for i in range(len(vendedores)):
-        print(f"{i} - {vendedores[i].firstname} {vendedores[i].lastname}")
+        print(f"{i} - {vendedores[i][2]} {vendedores[i][1]}")
     vendedor_ordem = int(input("\nEscolha um vendedor: "))
     vendedor = vendedores[vendedor_ordem]
     return vendedor
 
 
-def inserir_order(customer: Customers, vendedor: Employees) -> Orders:
+def inserir_order(customer: str, vendedor: id):
     """insere um Order no banco de dados
 
     Args:
@@ -88,18 +88,13 @@ def inserir_order(customer: Customers, vendedor: Employees) -> Orders:
         Orders: A order criada
     """
     data_do_pedido = datetime.datetime.now().__str__()
-    ordem = Orders(
-        orderdate=data_do_pedido,
-        customerid=customer.customerid,
-        employeeid=vendedor.employeeid,
-    )
-    insert_orders(ordem)
-    return ordem
+    orderid = insert_orders(customer=customer, employee=vendedor, orderdate=data_do_pedido)
+    return orderid
 
 
 def inserir_order_details(
-    order: Orders, produto: Products, quantidade: int, unit_price: float
-) -> None:
+    order: int, produto: int, quantidade: int, unit_price: float
+):
     """insere um OrderDetails no banco de dados
 
     Args:
@@ -108,13 +103,7 @@ def inserir_order_details(
         quantidade (int): quantidade de produtos
         unit_price (float): valor do produto
     """
-    order_details = OrderDetails(
-        orderid=order.orderid,
-        productid=produto.productid,
-        quantity=quantidade,
-        unitprice=unit_price,
-    )
-    insert_order_details(order_details)
+    insert_order_details(order, produto, quantidade, unit_price)
 
 
 def buscar_produto() -> Products:
@@ -131,9 +120,11 @@ def buscar_produto() -> Products:
         )
         produtos = search_products(name_string)
         if produtos == []:
-            name_string = input("Nenhum produto possui esse nome, digite novamente: \n")
+            input(
+                "Nenhum produto possui esse nome, pressione enter para tentar novamente. \n"
+            )
     for i in range(len(produtos)):
-        print(f"{i} - {produtos[i].productname}")
+        print(f"{i} - {produtos[i][1]}")
     produto_ordem = int(input("\nEscolha um produto: "))
     produto = produtos[produto_ordem]
     return produto
@@ -198,7 +189,7 @@ def gerar_ranking_funcionarios():
     lista = []
     for i in count_by_employee:
         employee = search_employee_by_id(i[0])
-        lista.append([f"{employee.firstname} {employee.lastname}", i[1], i[2]])
+        lista.append([f"{employee[2]} {employee[1]}", i[1], i[2]])
     lista = sorted(lista, key=lambda x: x[2], reverse=True)
     print(
         tabulate(
