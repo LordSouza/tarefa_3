@@ -58,3 +58,12 @@ def search_employee(name: String) -> Employees:
         )
     except Exception as e:
         print(e)
+
+
+def search_order_by_id(order_id: int):
+    # buscar um pedido pelo id
+    try:
+        db = next(get_db())
+        return db.query(Orders).filter(Orders.orderid == order_id).first()
+    except Exception as e:
+        print(e)

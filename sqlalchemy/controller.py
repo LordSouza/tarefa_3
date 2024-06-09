@@ -1,6 +1,7 @@
 from DAO import *
 import os
 import datetime
+from tabulate import tabulate
 
 
 def inserir_pedido():
@@ -138,9 +139,33 @@ def buscar_produto() -> Products:
     return produto
 
 
-def gerar_ranking_funcionarios():
-    pass
+def map_products(order_details):
+    return [
+        order_details.products.productname,
+        order_details.products.unitprice,
+        order_details.quantity,
+    ]
 
 
 def gerar_relatorio_pedidos():
+    os.system("cls" if os.name == "nt" else "clear")
+    numero_pedido = int(input("Digite o número do pedido: "))
+    os.system("cls" if os.name == "nt" else "clear")
+    order = search_order_by_id(numero_pedido)
+    print(
+        f"Número do pedido: {order.orderid}\nData do pedido: {order.orderdate}\nCliente: {order.customers.companyname}\nVendedor: {order.employees.firstname} {order.employees.lastname}\n"
+    )
+    print("Produtos:")
+    lista_produtos = map(map_products, order.order_details)
+    print(
+        tabulate(
+            lista_produtos,
+            headers=["Produto", "Preço", "Quantidade"],
+            tablefmt="orgtbl",
+        )
+    )
+    input("\nPressione enter para continuar...")
+
+
+def gerar_ranking_funcionarios():
     pass
