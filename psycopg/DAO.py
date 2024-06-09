@@ -1,5 +1,6 @@
 import psycopg
 
+
 def get_db():
     northwind = psycopg.connect(
         host="localhost",
@@ -17,7 +18,6 @@ def get_db():
 
 import datetime
 from model import *
-
 
 
 def insert_orders(order: Orders):
