@@ -1,6 +1,16 @@
 from typing import List
 
-from sqlalchemy import Column, DateTime, ForeignKeyConstraint, Integer, Numeric, PrimaryKeyConstraint, SmallInteger, String, Text
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKeyConstraint,
+    Integer,
+    Numeric,
+    PrimaryKeyConstraint,
+    SmallInteger,
+    String,
+    Text,
+)
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
 from sqlalchemy.orm.base import Mapped
 
@@ -8,10 +18,10 @@ Base = declarative_base()
 
 
 class Categories(Base):
-    __tablename__ = 'categories'
+    __tablename__ = "categories"
     __table_args__ = (
-        PrimaryKeyConstraint('categoryid', name='categories_pkey'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("categoryid", name="categories_pkey"),
+        {"schema": "northwind"},
     )
 
     categoryid = mapped_column(Integer)
@@ -20,10 +30,10 @@ class Categories(Base):
 
 
 class Customers(Base):
-    __tablename__ = 'customers'
+    __tablename__ = "customers"
     __table_args__ = (
-        PrimaryKeyConstraint('customerid', name='customers_pkey'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("customerid", name="customers_pkey"),
+        {"schema": "northwind"},
     )
 
     customerid = mapped_column(String(5))
@@ -38,14 +48,16 @@ class Customers(Base):
     phone = mapped_column(String(17))
     fax = mapped_column(String(17))
 
-    orders: Mapped[List['Orders']] = relationship('Orders', uselist=True, back_populates='customers')
+    orders: Mapped[List["Orders"]] = relationship(
+        "Orders", uselist=True, back_populates="customers"
+    )
 
 
 class Employees(Base):
-    __tablename__ = 'employees'
+    __tablename__ = "employees"
     __table_args__ = (
-        PrimaryKeyConstraint('employeeid', name='employees_pkey'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("employeeid", name="employees_pkey"),
+        {"schema": "northwind"},
     )
 
     employeeid = mapped_column(Integer)
@@ -65,14 +77,16 @@ class Employees(Base):
     reportsto = mapped_column(Integer)
     notes = mapped_column(Text)
 
-    orders: Mapped[List['Orders']] = relationship('Orders', uselist=True, back_populates='employees')
+    orders: Mapped[List["Orders"]] = relationship(
+        "Orders", uselist=True, back_populates="employees"
+    )
 
 
 class Products(Base):
-    __tablename__ = 'products'
+    __tablename__ = "products"
     __table_args__ = (
-        PrimaryKeyConstraint('productid', name='products_pkey'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("productid", name="products_pkey"),
+        {"schema": "northwind"},
     )
 
     productid = mapped_column(Integer)
@@ -86,14 +100,16 @@ class Products(Base):
     reorderlevel = mapped_column(SmallInteger)
     discontinued = mapped_column(String(1))
 
-    order_details: Mapped[List['OrderDetails']] = relationship('OrderDetails', uselist=True, back_populates='products')
+    order_details: Mapped[List["OrderDetails"]] = relationship(
+        "OrderDetails", uselist=True, back_populates="products"
+    )
 
 
 class Shippers(Base):
-    __tablename__ = 'shippers'
+    __tablename__ = "shippers"
     __table_args__ = (
-        PrimaryKeyConstraint('shipperid', name='shippers_pkey'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("shipperid", name="shippers_pkey"),
+        {"schema": "northwind"},
     )
 
     shipperid = mapped_column(Integer)
@@ -102,10 +118,10 @@ class Shippers(Base):
 
 
 class Suppliers(Base):
-    __tablename__ = 'suppliers'
+    __tablename__ = "suppliers"
     __table_args__ = (
-        PrimaryKeyConstraint('supplierid', name='supplier_pk'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("supplierid", name="supplier_pk"),
+        {"schema": "northwind"},
     )
 
     supplierid = mapped_column(Integer)
@@ -123,12 +139,24 @@ class Suppliers(Base):
 
 
 class Orders(Base):
-    __tablename__ = 'orders'
+    __tablename__ = "orders"
     __table_args__ = (
-        ForeignKeyConstraint(['customerid'], ['northwind.customers.customerid'], ondelete='RESTRICT', onupdate='CASCADE', name='orders_customerid_fkey'),
-        ForeignKeyConstraint(['employeeid'], ['northwind.employees.employeeid'], ondelete='RESTRICT', onupdate='CASCADE', name='employee_id'),
-        PrimaryKeyConstraint('orderid', name='orders_pkey'),
-        {'schema': 'northwind'}
+        ForeignKeyConstraint(
+            ["customerid"],
+            ["northwind.customers.customerid"],
+            ondelete="RESTRICT",
+            onupdate="CASCADE",
+            name="orders_customerid_fkey",
+        ),
+        ForeignKeyConstraint(
+            ["employeeid"],
+            ["northwind.employees.employeeid"],
+            ondelete="RESTRICT",
+            onupdate="CASCADE",
+            name="employee_id",
+        ),
+        PrimaryKeyConstraint("orderid", name="orders_pkey"),
+        {"schema": "northwind"},
     )
 
     orderid = mapped_column(Integer)
@@ -146,18 +174,32 @@ class Orders(Base):
     shipcountry = mapped_column(String(15))
     shipperid = mapped_column(Integer)
 
-    customers: Mapped['Customers'] = relationship('Customers', back_populates='orders')
-    employees: Mapped['Employees'] = relationship('Employees', back_populates='orders')
-    order_details: Mapped[List['OrderDetails']] = relationship('OrderDetails', uselist=True, back_populates='orders')
+    customers: Mapped["Customers"] = relationship("Customers", back_populates="orders")
+    employees: Mapped["Employees"] = relationship("Employees", back_populates="orders")
+    order_details: Mapped[List["OrderDetails"]] = relationship(
+        "OrderDetails", uselist=True, back_populates="orders"
+    )
 
 
 class OrderDetails(Base):
-    __tablename__ = 'order_details'
+    __tablename__ = "order_details"
     __table_args__ = (
-        ForeignKeyConstraint(['orderid'], ['northwind.orders.orderid'], ondelete='RESTRICT', onupdate='CASCADE', name='order_details_orderid_fkey'),
-        ForeignKeyConstraint(['productid'], ['northwind.products.productid'], ondelete='RESTRICT', onupdate='CASCADE', name='order_details_productid_fkey'),
-        PrimaryKeyConstraint('orderid', 'productid', name='order_details_pkey'),
-        {'schema': 'northwind'}
+        ForeignKeyConstraint(
+            ["orderid"],
+            ["northwind.orders.orderid"],
+            ondelete="RESTRICT",
+            onupdate="CASCADE",
+            name="order_details_orderid_fkey",
+        ),
+        ForeignKeyConstraint(
+            ["productid"],
+            ["northwind.products.productid"],
+            ondelete="RESTRICT",
+            onupdate="CASCADE",
+            name="order_details_productid_fkey",
+        ),
+        PrimaryKeyConstraint("orderid", "productid", name="order_details_pkey"),
+        {"schema": "northwind"},
     )
 
     orderid = mapped_column(Integer, nullable=False)
@@ -166,5 +208,7 @@ class OrderDetails(Base):
     quantity = mapped_column(SmallInteger)
     discount = mapped_column(Numeric(10, 4))
 
-    orders: Mapped['Orders'] = relationship('Orders', back_populates='order_details')
-    products: Mapped['Products'] = relationship('Products', back_populates='order_details')
+    orders: Mapped["Orders"] = relationship("Orders", back_populates="order_details")
+    products: Mapped["Products"] = relationship(
+        "Products", back_populates="order_details"
+    )

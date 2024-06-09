@@ -2,7 +2,6 @@ from model import *
 from engine import get_db
 
 
-
 def insert_orders(order: Orders):
     try:
         db = next(get_db())

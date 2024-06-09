@@ -4,7 +4,6 @@ import datetime
 from engine import get_db
 
 
-
 def inserir_pedido():
     customer = buscar_cliente()
     vendedor = buscar_vendedor()
