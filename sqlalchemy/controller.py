@@ -1,10 +1,10 @@
 from DAO import *
 import os
 import datetime
-from engine import get_db
 
 
 def inserir_pedido():
+    """insere um pedido com seus detalhes no banco de dados recebendo informações do usuario quando necessário"""
     customer = buscar_cliente()
     vendedor = buscar_vendedor()
     pedido = inserir_order(customer, vendedor)
@@ -29,6 +29,11 @@ def inserir_pedido():
 
 
 def buscar_cliente() -> Customers:
+    """busca um cliente no banco de dados
+
+    Returns:
+        Customers: cliente selecionado pelo usuario
+    """
     custumers = []
     while custumers == []:
         os.system("cls" if os.name == "nt" else "clear")
@@ -48,6 +53,11 @@ def buscar_cliente() -> Customers:
 
 
 def buscar_vendedor() -> Employees:
+    """busca um vendedor no banco de dados
+
+    Returns:
+        Employees: vendedor selecionado pelo usuario
+    """
     vendedores = []
     while vendedores == []:
         os.system("cls" if os.name == "nt" else "clear")
@@ -67,6 +77,15 @@ def buscar_vendedor() -> Employees:
 
 
 def inserir_order(customer: Customers, vendedor: Employees) -> Orders:
+    """insere um Order no banco de dados
+
+    Args:
+        customer (Customers): Customers que o usuário selecionou
+        vendedor (Employees): Vendedor que foi selecionado
+
+    Returns:
+        Orders: A order criada
+    """
     data_do_pedido = datetime.datetime.now().__str__()
     ordem = Orders(
         orderdate=data_do_pedido,
@@ -80,6 +99,14 @@ def inserir_order(customer: Customers, vendedor: Employees) -> Orders:
 def inserir_order_details(
     order: Orders, produto: Products, quantidade: int, unit_price: float
 ) -> None:
+    """insere um OrderDetails no banco de dados
+
+    Args:
+        order (Orders): order criado anteriormente
+        produto (Products): produto selecionado pelo usuario
+        quantidade (int): quantidade de produtos
+        unit_price (float): valor do produto
+    """
     order_details = OrderDetails(
         orderid=order.orderid,
         productid=produto.productid,
@@ -87,10 +114,14 @@ def inserir_order_details(
         unitprice=unit_price,
     )
     insert_order_details(order_details)
-    return order_details
 
 
 def buscar_produto() -> Products:
+    """recebe uma string e retorna uma lista de produtos que possuem essa string no nome
+
+    Returns:
+        Products: um unico produto selecionado pelo usuario
+    """
     produtos = []
     while produtos == []:
         os.system("cls" if os.name == "nt" else "clear")
@@ -105,3 +136,11 @@ def buscar_produto() -> Products:
     produto_ordem = int(input("\nEscolha um produto: "))
     produto = produtos[produto_ordem]
     return produto
+
+
+def gerar_ranking_funcionarios():
+    pass
+
+
+def gerar_relatorio_pedidos():
+    pass

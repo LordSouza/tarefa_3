@@ -14,9 +14,9 @@ while True:
         case "1":
             inserir_pedido()
         case "2":
-            pass
+            gerar_relatorio_pedidos()
         case "3":
-            pass
+            gerar_ranking_funcionarios()
         case "0":
             break
         case _:
