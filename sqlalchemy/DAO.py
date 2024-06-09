@@ -1,5 +1,7 @@
+import datetime
 from model import *
 from engine import get_db
+from sqlalchemy import func
 
 
 def insert_orders(order: Orders):
@@ -60,10 +62,40 @@ def search_employee(name: String) -> Employees:
         print(e)
 
 
+def search_employee_by_id(id: int) -> Employees:
+    # inserir um novo funcionário
+    try:
+        db = next(get_db())
+        return db.query(Employees).filter(Employees.employeeid == id).first()
+    except Exception as e:
+        print(e)
+
+
 def search_order_by_id(order_id: int):
     # buscar um pedido pelo id
     try:
         db = next(get_db())
         return db.query(Orders).filter(Orders.orderid == order_id).first()
+    except Exception as e:
+        print(e)
+
+
+def select_count_orders_by_employee(
+    data_inicial: datetime.datetime, data_final: datetime.datetime
+) -> Orders:
+    # buscar todos os funcionários
+    try:
+        db = next(get_db())
+        return (
+            db.query(
+                Orders.employeeid,
+                func.count(Orders.employeeid),
+                func.sum(OrderDetails.unitprice * OrderDetails.quantity),
+            )
+            .join(OrderDetails, Orders.orderid == OrderDetails.orderid)
+            .filter(Orders.orderdate.between(data_inicial, data_final))
+            .group_by(Orders.employeeid)
+            .all()
+        )
     except Exception as e:
         print(e)

@@ -1,0 +1,4 @@
+tabulate==0.9.0
+SQLAlchemy==2.0.30
+psycopg==3.1.19
+psycopg2==2.9.9

@@ -157,15 +157,49 @@ def gerar_relatorio_pedidos():
     )
     print("Produtos:")
     lista_produtos = map(map_products, order.order_details)
-    print(
-        tabulate(
-            lista_produtos,
-            headers=["Produto", "Preço", "Quantidade"],
-            tablefmt="orgtbl",
-        )
-    )
+    print(tabulate(lista_produtos, headers=["Produto", "Preço", "Quantidade"]))
     input("\nPressione enter para continuar...")
 
 
 def gerar_ranking_funcionarios():
-    pass
+    os.system("cls" if os.name == "nt" else "clear")
+    while True:
+        try:
+            data_inicial = input("digite a data inicial no formato aaaa-mm-dd: ").split(
+                "-"
+            )
+            data_inicial = datetime.datetime(
+                int(data_inicial[0]), int(data_inicial[1]), int(data_inicial[2])
+            )
+            break
+        except:
+            print("Data inicial inválida")
+            continue
+    while True:
+        try:
+            data_final = input("digite a data final no formato aaaa-mm-dd: ").split("-")
+            data_final = datetime.datetime(
+                int(data_final[0]), int(data_final[1]), int(data_final[2])
+            )
+            break
+        except:
+            print("Data final inválida")
+            continue
+    os.system("cls" if os.name == "nt" else "clear")
+    count_by_employee = select_count_orders_by_employee(data_inicial, data_final)
+    lista = []
+    for i in count_by_employee:
+        employee = search_employee_by_id(i[0])
+        lista.append([f"{employee.firstname} {employee.lastname}", i[1], i[2]])
+    lista = sorted(lista, key=lambda x: x[2], reverse=True)
+    print(
+        tabulate(
+            lista,
+            headers=[
+                "Funcionário",
+                "Quantidade de pedidos",
+                "Soma dos valores vendidos",
+            ],
+        )
+    )
+    input("\nPressione enter para continuar...")
