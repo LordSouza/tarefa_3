@@ -8,7 +8,7 @@
             "name": "Psycopg",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/psycopg/model.py",
+            "program": "${workspaceFolder}/psycopg/view.py",
             "console": "integratedTerminal"
         },
         {

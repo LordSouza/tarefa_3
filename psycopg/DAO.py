@@ -1,4 +1,6 @@
 import psycopg
+import datetime
+from model import *
 
 
 def get_db():
@@ -12,12 +14,6 @@ def get_db():
         yield northwind.cursor()
     except Exception as e:
         print(e)
-    finally:
-        northwind.close()
-
-
-import datetime
-from model import *
 
 
 def insert_orders(order: Orders):
@@ -42,47 +38,38 @@ def insert_order_details(order_details: OrderDetails):
         print(e)
 
 
-def search_customers(name: str) -> Customers:
+def search_customers(name: str):
     # buscar um cliente
     try:
         db = next(get_db())
-        return db.query(Customers).filter(Customers.contactname.like(f"{name}%")).all()
+        return db.execute("SELECT * FROM northwind.customers WHERE contactname LIKE %s", (name,)).fetchall()
     except Exception as e:
         print(e)
 
 
-def search_products(productname: str) -> Products:
+def search_products(productname: str):
     # buscar um produto
     try:
         db = next(get_db())
-        return (
-            db.query(Products)
-            .filter(Products.productname.like(f"{productname}%"))
-            .all()
-        )
+        return db.execute("SELECT * FROM northwind.products WHERE productname LIKE %s", (productname,)).fetchall()
     except Exception as e:
         print(e)
 
 
-def search_employee(name: str) -> Employees:
+def search_employee(name: str):
     # inserir um novo funcionário
     try:
         db = next(get_db())
-        return list(
-            set(
-                db.query(Employees).filter(Employees.lastname.like(f"{name}%")).all()
-                + db.query(Employees).filter(Employees.firstname.like(f"{name}%")).all()
-            )
-        )
+        return db.execute("SELECT * FROM northwind.employees WHERE lastname LIKE %s OR firstname LIKE %s", (name,name)).fetchall()
     except Exception as e:
         print(e)
 
 
-def search_employee_by_id(id: int) -> Employees:
+def search_employee_by_id(id: int):
     # inserir um novo funcionário
     try:
         db = next(get_db())
-        return db.query(Employees).filter(Employees.employeeid == id).first()
+        return db.execute("SELECT * FROM northwind.employees WHERE employeeid = %s", (id,)).fetchone()
     except Exception as e:
         print(e)
 
@@ -91,27 +78,46 @@ def search_order_by_id(order_id: int):
     # buscar um pedido pelo id
     try:
         db = next(get_db())
-        return db.query(Orders).filter(Orders.orderid == order_id).first()
+        return db.execute("SELECT * FROM northwind.orders WHERE orderid = %s", (order_id,)).fetchone()
     except Exception as e:
         print(e)
 
+def search_products_by_id(product_id: int):
+    # buscar um produto pelo id
+    try:
+        db = next(get_db())
+        return db.execute("SELECT * FROM northwind.products WHERE productid = %s", (product_id,)).fetchone()
+    except Exception as e:
+        print(e)
+
+def search_customer_by_id(customer_id: str):
+    # buscar um cliente pelo id
+    try:
+        db = next(get_db())
+        return db.execute("SELECT * FROM northwind.customers WHERE customerid = %s", (customer_id,)).fetchone()
+    except Exception as e:
+        print(e)
+
+def select_order_details_by_order_id(order_id: int):
+    # buscar os detalhes de um pedido
+    try:
+        db = next(get_db())
+        return db.execute("SELECT * FROM northwind.order_details WHERE orderid = %s", (order_id,)).fetchall()
+    except Exception as e:
+        print(e)
 
 def select_count_orders_by_employee(
     data_inicial: datetime.datetime, data_final: datetime.datetime
-) -> Orders:
+):
     # buscar todos os funcionários
     try:
         db = next(get_db())
-        return (
-            db.query(
-                Orders.employeeid,
-                func.count(Orders.employeeid),
-                func.sum(OrderDetails.unitprice * OrderDetails.quantity),
-            )
-            .join(OrderDetails, Orders.orderid == OrderDetails.orderid)
-            .filter(Orders.orderdate.between(data_inicial, data_final))
-            .group_by(Orders.employeeid)
-            .all()
-        )
+        return db.execute("""select o.employeeid, count(o.employeeid), sum(od.unitprice * od.quantity)
+                                from northwind.orders o
+                                left join northwind.order_details od 
+                                on od.orderid = o.orderid 
+                                where o.orderdate between %s and %s 
+                                group by o.employeeid""", 
+                                (data_inicial, data_final)).fetchall()
     except Exception as e:
         print(e)

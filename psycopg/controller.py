@@ -140,10 +140,11 @@ def buscar_produto() -> Products:
 
 
 def map_products(order_details):
+    product = search_products_by_id(order_details[1])
     return [
-        order_details.products.productname,
-        order_details.products.unitprice,
-        order_details.quantity,
+        product[1],
+        order_details[2],
+        order_details[3],
     ]
 
 
@@ -152,11 +153,18 @@ def gerar_relatorio_pedidos():
     numero_pedido = int(input("Digite o número do pedido: "))
     os.system("cls" if os.name == "nt" else "clear")
     order = search_order_by_id(numero_pedido)
+    if order is None:
+        print("Pedido não encontrado")
+        input("\nPressione enter para continuar...")
+        return
+    cliente = search_customer_by_id(order[1])
+    vendedor = search_employee_by_id(order[2])
     print(
-        f"Número do pedido: {order.orderid}\nData do pedido: {order.orderdate}\nCliente: {order.customers.companyname}\nVendedor: {order.employees.firstname} {order.employees.lastname}\n"
+        f"Número do pedido: {order[0]}\nData do pedido: {order[3].__str__()}\nCliente: {cliente[1]}\nVendedor: {vendedor[2]} {vendedor[1]}\n"
     )
     print("Produtos:")
-    lista_produtos = map(map_products, order.order_details)
+    order_details = select_order_details_by_order_id(order[0])
+    lista_produtos = map(map_products, order_details)
     print(tabulate(lista_produtos, headers=["Produto", "Preço", "Quantidade"]))
     input("\nPressione enter para continuar...")
 

@@ -152,6 +152,10 @@ def gerar_relatorio_pedidos():
     numero_pedido = int(input("Digite o número do pedido: "))
     os.system("cls" if os.name == "nt" else "clear")
     order = search_order_by_id(numero_pedido)
+    if order is None:
+        print("Pedido não encontrado")
+        input("\nPressione enter para continuar...")
+        return
     print(
         f"Número do pedido: {order.orderid}\nData do pedido: {order.orderdate}\nCliente: {order.customers.companyname}\nVendedor: {order.employees.firstname} {order.employees.lastname}\n"
     )
